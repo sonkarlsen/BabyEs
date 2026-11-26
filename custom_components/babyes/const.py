@@ -1,7 +1,7 @@
 """Constants for BabyEs."""
 
 DOMAIN = "babyes"
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 
 STORAGE_KEY = "babyes.diary"
 STORAGE_VERSION = 1
@@ -15,3 +15,6 @@ DEFAULT_NAME = "Baby"
 
 FRONTEND_URL = "/babyes_frontend"
 CARD_FILE = "babyes-card.js"
+# Registered with Home Assistant; it imports CARD_FILE using the file's current
+# version, so card-only updates need a page reload, not a restart.
+LOADER_FILE = "babyes-loader.js"

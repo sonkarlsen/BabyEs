@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_change, async_track_time_interval
 
-from .const import CARD_FILE, CONF_NAME, DEFAULT_NAME, DOMAIN, FRONTEND_URL, VERSION
+from .const import CONF_NAME, DEFAULT_NAME, DOMAIN, FRONTEND_URL, LOADER_FILE, VERSION
 from .services import async_register_services
 from .store import Diary
 from .websocket import async_register_websocket
@@ -37,7 +37,8 @@ async def _register_frontend(hass: HomeAssistant) -> None:
         hass.http.register_static_path(FRONTEND_URL, path, False)
     from homeassistant.components.frontend import add_extra_js_url
 
-    add_extra_js_url(hass, f"{FRONTEND_URL}/{CARD_FILE}?v={VERSION}")
+    # The loader picks up a new babyes-card.js after a page reload, no restart needed.
+    add_extra_js_url(hass, f"{FRONTEND_URL}/{LOADER_FILE}?v={VERSION}")
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:

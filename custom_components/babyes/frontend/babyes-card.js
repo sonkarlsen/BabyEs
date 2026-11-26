@@ -15,7 +15,7 @@
 (() => {
   "use strict";
   const TAG = "babyes-card";
-  const VERSION = "0.2.0";
+  const VERSION = "0.2.1";
   if (customElements.get(TAG)) return;
 
   /* ---------- language ---------- */
@@ -200,6 +200,58 @@
     return out;
   };
 
+  /* ---------- colours ---------- */
+  // Bottles use a theme colour that clearly differs from the sleep colour.
+  // accent-color is used when it is different enough; otherwise the most
+  // different of the theme's other named colours.
+  let paint = null;
+  const toRgb = (value) => {
+    const s = String(value || "").trim();
+    if (!s) return null;
+    paint = paint || document.createElement("canvas").getContext("2d");
+    paint.fillStyle = "#010203";
+    paint.fillStyle = s;
+    const out = paint.fillStyle;
+    if (out === "#010203") return null; // not a colour the browser understands
+    if (out[0] === "#") return [1, 3, 5].map((i) => parseInt(out.slice(i, i + 2), 16));
+    const m = out.match(/rgba?\(([^)]+)\)/);
+    return m ? m[1].split(",").slice(0, 3).map((x) => Number(x)) : null;
+  };
+  const hsl = ([r, g, b]) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+    if (!d) return [0, 0, l];
+    let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h *= 60; if (h < 0) h += 360;
+    return [h, d / (1 - Math.abs(2 * l - 1)), l];
+  };
+  // 0 = looks the same, 1 = opposite hues (or very different lightness).
+  const colourGap = (a, b) => {
+    const A = hsl(a), B = hsl(b);
+    const dh = Math.abs(A[0] - B[0]) % 360;
+    const hue = A[1] > 0.2 && B[1] > 0.2 ? Math.min(dh, 360 - dh) / 180 : 0;
+    return Math.max(hue, Math.abs(A[2] - B[2]) * 1.6);
+  };
+  const FEED_CANDIDATES = ["--accent-color", "--amber-color", "--orange-color", "--yellow-color", "--warning-color",
+    "--deep-orange-color", "--blue-color", "--light-blue-color", "--cyan-color", "--teal-color", "--green-color",
+    "--indigo-color", "--purple-color", "--pink-color", "--red-color"];
+  const pickFeedColour = (el) => {
+    const cs = getComputedStyle(el);
+    if (cs.getPropertyValue("--babyes-feed-color").trim()) return ""; // the theme chose one explicitly
+    const sleep = toRgb(cs.getPropertyValue("--babyes-sleep-color")) || toRgb(cs.getPropertyValue("--primary-color"));
+    if (!sleep) return "";
+    let best = null;
+    FEED_CANDIDATES.forEach((name, i) => {
+      const raw = cs.getPropertyValue(name).trim();
+      const rgb = toRgb(raw);
+      if (!rgb || hsl(rgb)[1] < 0.25) return;
+      const gap = colourGap(sleep, rgb);
+      const score = i === 0 && gap >= 0.33 ? 9 : gap - i * 0.01; // a clearly different accent always wins
+      if (!best || score > best.score) best = { raw, score };
+    });
+    return best ? best.raw : "";
+  };
+
   /* ---------- 24 h dial ---------- */
   const pt = (c, h, r) => { const a = (h / 24) * Math.PI * 2; return [c + r * Math.sin(a), c - r * Math.cos(a)]; };
   const arc = (c, a, b, r) => {
@@ -259,7 +311,8 @@
     --be-ink:var(--primary-text-color,#212121);--be-muted:var(--secondary-text-color,#727272);
     --be-line:var(--divider-color,rgba(0,0,0,.12));
     --be-sleep:var(--babyes-sleep-color,var(--primary-color,#03a9f4));
-    --be-feed:var(--babyes-feed-color,var(--accent-color,#ff9800));
+    /* --be-feed-auto: a theme colour picked in JS to differ clearly from the sleep colour */
+    --be-feed:var(--babyes-feed-color,var(--be-feed-auto,var(--accent-color,#ff9800)));
     --be-sleep-ink:color-mix(in srgb,var(--be-sleep) 72%,var(--be-ink));
     --be-feed-ink:color-mix(in srgb,var(--be-feed) 62%,var(--be-ink));
     --be-milk:var(--babyes-milk-color,var(--be-feed));
@@ -309,16 +362,18 @@
   .tl-wrap>div{overflow:hidden;min-height:0}
   .tl{display:flex;flex-direction:column;gap:6px;padding:4px 0 6px;opacity:0;transform:translateY(-4px);transition:opacity .2s ease,transform .3s ease}
   .tl-wrap.open .tl{opacity:1;transform:none;transition-delay:.08s}
-  .track{position:relative;height:26px;border-radius:8px;background:var(--be-soft);overflow:hidden}
+  .track{position:relative;height:26px;margin:4px 0}
+  .track .bg{position:absolute;inset:0;border-radius:8px;background:var(--be-soft);overflow:hidden}
   .track i{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--be-sleep)}
   .track i.live{opacity:.6;border-radius:6px 0 0 6px}
-  .track b{position:absolute;top:5px;bottom:5px;width:4px;margin-left:-2px;border-radius:2px;background:var(--be-feed)}
-  .track u{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--be-ink)}
+  /* bottle ticks: taller than the track, with a ring in the card colour so they stand out on sleep blocks */
+  .track b{position:absolute;top:-4px;bottom:-4px;width:6px;margin-left:-3px;border-radius:3px;background:var(--be-feed);box-shadow:0 0 0 2px var(--be-card)}
+  .track u{position:absolute;top:-2px;bottom:-2px;width:2px;margin-left:-1px;border-radius:1px;background:var(--be-ink)}
   .hours{display:flex;justify-content:space-between;font-size:11px;color:var(--be-muted)}
   .legend{display:flex;gap:16px;font-size:13px;color:var(--be-muted)}
   .legend span{display:flex;align-items:center;gap:6px}
   .legend i{width:10px;height:10px;border-radius:3px;background:var(--be-sleep)}
-  .legend b{width:4px;height:12px;border-radius:2px;background:var(--be-feed)}
+  .legend b{width:6px;height:14px;border-radius:3px;background:var(--be-feed)}
   .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:6px;border-top:1px solid var(--be-line)}
   .act{min-height:52px;border:0;background:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;transition:background-color .15s ease}
   .act:hover{background:var(--be-soft)}
@@ -489,12 +544,29 @@
         this._renderCard();
         if (this._pane) this._renderSheet();
       }
+      // A different theme or light/dark mode can change which bottle colour stands out.
+      const themeKey = `${JSON.stringify(h?.selectedTheme ?? "")}|${h?.themes?.theme ?? ""}|${!!h?.themes?.darkMode}`;
+      if (themeKey !== this._themeKey) {
+        this._themeKey = themeKey;
+        // Let Home Assistant apply the new theme variables first.
+        clearTimeout(this._themeTimer);
+        this._themeTimer = setTimeout(() => this._applyFeedColour(), 60);
+      }
       if (this.isConnected) this._start();
+    }
+    _applyFeedColour() {
+      if (!this.isConnected) return;
+      const c = pickFeedColour(this);
+      if (c === this._feedColour) return;
+      this._feedColour = c;
+      if (c) this.style.setProperty("--be-feed-auto", c);
+      else this.style.removeProperty("--be-feed-auto");
     }
     get hass() { return this._hass; }
     connectedCallback() {
       // Several cards share one module-level language; make sure this one is current.
       if (this._hass && localeKey(this._hass) !== this._localeKey) { this._localeKey = localeKey(this._hass); pickLang(this._hass); }
+      this._applyFeedColour();
       this._start();
       if (!this._tick) this._tick = setInterval(() => { this._renderCard(); if (this._pane === "history") this._renderSheet(); }, 30000);
       this._renderCard();
@@ -505,6 +577,7 @@
       clearTimeout(this._toastTimer);
       clearTimeout(this._closeTimer);
       clearTimeout(this._introTimer);
+      clearTimeout(this._themeTimer);
       if (this._unsub) { try { this._unsub(); } catch (_) { /* gone */ } }
       this._unsub = null;
       this._started = false;
@@ -571,6 +644,7 @@
     /* ---------- card ---------- */
     _renderCard() {
       if (!this._cardEl) return;
+      this._applyFeedColour();
       const name = this._name;
       const now = Date.now();
       const today = dayKey(new Date());
@@ -619,7 +693,7 @@
       const nowLine = `<u style="left:${pct((now - dayStart(today)) / 3600000)}%"></u>`;
       const open = this._timeline;
       const timeline = `<div class="tl-wrap${open ? " open" : ""}" id="tl"><div><div class="tl" role="img" aria-label="${esc(t("timelineAria"))}">
-          <div class="track">${blocks}${ticks}${nowLine}</div>
+          <div class="track"><div class="bg">${blocks}</div>${ticks}${nowLine}</div>
           <div class="hours" aria-hidden="true">${[0, 6, 12, 18, 24].map((h) => `<span>${esc(hourLabel(h))}</span>`).join("")}</div>
           <div class="legend" aria-hidden="true"><span><i></i>${esc(t("legendSleep"))}</span><span><b></b>${esc(t("legendFeed"))}</span></div>
         </div></div></div>`;

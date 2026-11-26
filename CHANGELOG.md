@@ -1,5 +1,18 @@
 # Changelog
 
+Each release says whether Home Assistant needs a restart. Card-only updates only need a reload of the dashboard.
+
+## 0.2.1
+
+Restart needed: **yes**, once. After this, updates that only change the card need just a page reload.
+
+### Card
+- Bottles in the timeline now always stand out from sleep: the card picks the theme colour that differs most from the sleep colour when the theme's accent colour is too similar. Bottle marks are also taller and outlined, so they show on top of sleep periods.
+
+### Integration
+- Card updates now show after a page reload, without restarting Home Assistant.
+- BabyEs now ships its own icon (light and dark), shown in Home Assistant 2026.3 and later, for example under Devices & services and in HACS updates.
+
 ## 0.2.0
 
 ### Card

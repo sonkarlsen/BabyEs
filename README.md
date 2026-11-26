@@ -26,7 +26,7 @@ step: 5        # ml per tap (optional)
 name: Baby     # optional, overrides the name from the integration
 ```
 
-Updates show up in HACS. After updating, restart Home Assistant and reload the dashboard.
+Updates show up in HACS. Updates that only change the card take effect when you reload the dashboard. Updates that change the integration need a restart of Home Assistant; the [changelog](CHANGELOG.md) says which.
 
 ## Entities
 
@@ -49,7 +49,7 @@ Entity ids depend on the name you choose and your language.
 
 ## Theming, language and clock
 
-The card uses the colours of your active Home Assistant theme, in light and dark mode: card background, text and dividers from the theme, sleep in the theme's `primary-color` and bottles in its `accent-color`. To give BabyEs its own colours, add any of these variables to your theme: `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color`, `babyes-card-color`.
+The card uses the colours of your active Home Assistant theme, in light and dark mode: card background, text and dividers from the theme, sleep in the theme's `primary-color` and bottles in its `accent-color`. If those two look too similar, bottles use another colour from the theme that stands out from the sleep colour. To give BabyEs its own colours, add any of these variables to your theme: `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color`, `babyes-card-color`.
 
 The language follows the language in your Home Assistant profile (Norwegian or English; other languages use English) and changes as soon as you switch it. Times follow the **Time format** in your profile (12 or 24 hours), like the rest of Home Assistant.
 
@@ -81,8 +81,10 @@ type: custom:babyes-card
 step: 5
 ```
 
+Oppdateringer vises i HACS. Oppdateringer som bare endrer kortet, får du ved å laste dashbordet på nytt. Oppdateringer som endrer integrasjonen, krever omstart av Home Assistant; [endringsloggen](CHANGELOG.md) sier hvilke.
+
 ### Tema, språk og klokke
 
-Kortet bruker fargene i temaet du har valgt i Home Assistant: søvn i temaets `primary-color` og flasker i `accent-color`. Vil du ha egne farger, kan du legge til `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color` eller `babyes-card-color` i temaet.
+Kortet bruker fargene i temaet du har valgt i Home Assistant: søvn i temaets `primary-color` og flasker i `accent-color`. Er de to for like, får flaskene en annen farge fra temaet som skiller seg tydelig fra søvnfargen. Vil du ha egne farger, kan du legge til `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color` eller `babyes-card-color` i temaet.
 
 Språket følger profilen din og byttes med en gang du endrer det. Klokkeslett følger **Tidsformat** i profilen (12 eller 24 timer), som resten av Home Assistant.
