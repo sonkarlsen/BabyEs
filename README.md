@@ -10,7 +10,7 @@ English and Norwegian (bokmål). [Norsk nedenfor](#norsk).
 
 ## Install
 
-1. In HACS, open **⋮ → Custom repositories**, add this repository's URL with type **Integration**.
+1. In HACS, open **⋮ → Custom repositories**, add `https://github.com/sonkarlsen/BabyEs` with type **Integration**.
 2. Install **BabyEs** and restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration → BabyEs**. Enter a name (shown on the card) and choose whether to import earlier history.
 
@@ -78,7 +78,7 @@ En lokal dagbok for søvn og flasker i Home Assistant, med eget dashbordkort.
 
 ### Installering
 
-1. I HACS: **⋮ → Egendefinerte repositorier**, legg til adressen til dette repoet med type **Integrasjon**.
+1. I HACS: **⋮ → Egendefinerte repositorier**, legg til `https://github.com/sonkarlsen/BabyEs` med type **Integrasjon**.
 2. Installer **BabyEs** og start Home Assistant på nytt.
 3. Gå til **Innstillinger → Enheter og tjenester → Legg til integrasjon → BabyEs**. Skriv inn et navn (vises på kortet) og velg om tidligere historikk skal importeres.
 
