@@ -161,6 +161,7 @@ class Diary:
         if not isinstance(sleep, list) or not isinstance(feeds, list):
             raise DiaryError("corrupt")
         self.sleep, self.feeds = sleep, feeds
+        # Log of a one-time import in earlier versions; kept unchanged so no stored data is lost.
         self.imports = data.get("imports", []) if isinstance(data.get("imports"), list) else []
         self.revision = int(data.get("revision", 0))
 
@@ -334,25 +335,3 @@ class Diary:
             if not any(e["id"] == entry_id for e in self.feeds):
                 raise DiaryError("not_found")
             await self._commit(feeds=[e for e in self.feeds if e["id"] != entry_id])
-
-    # ---------- import ----------
-    async def merge_import(self, sleep: list[dict], feeds: list[dict], source: str) -> dict:
-        """Add records whose id is not in the diary yet. Never changes existing records."""
-        async with self._lock:
-            have_s = {r["id"] for r in self.sleep}
-            have_f = {e["id"] for e in self.feeds}
-            new_s = [dict(r, note=r.get("note") or "") for r in sleep if r["id"] not in have_s]
-            new_f = [dict(e, note=e.get("note") or "") for e in feeds if e["id"] not in have_f]
-            # Never import a second ongoing sleep: keep it only if none is running.
-            if self.ongoing():
-                new_s = [r for r in new_s if r.get("end") is not None]
-            elif sum(1 for r in new_s if r.get("end") is None) > 1:
-                ongoing = sorted((r for r in new_s if r.get("end") is None), key=lambda r: r["start"])
-                drop = {r["id"] for r in ongoing[:-1]}
-                new_s = [r for r in new_s if r["id"] not in drop]
-            result = {"at": iso(utcnow()), "source": source,
-                      "sleep_added": len(new_s), "feeds_added": len(new_f),
-                      "sleep_seen": len(sleep), "feeds_seen": len(feeds)}
-            await self._commit(sleep=[*self.sleep, *new_s], feeds=[*self.feeds, *new_f],
-                               imports=[*self.imports, result])
-            return result

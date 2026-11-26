@@ -5,12 +5,10 @@
         "title": "Sett opp BabyEs",
         "description": "En lokal dagbok for søvn og flasker. Alt lagres i Home Assistant og er med i sikkerhetskopiene dine.",
         "data": {
-          "name": "Navn",
-          "import_legacy": "Importer historikk fra de tidligere søvn- og flaskeintegrasjonene"
+          "name": "Navn"
         },
         "data_description": {
-          "name": "Vises på kortet og enheten. Blir værende i din Home Assistant.",
-          "import_legacy": "Kopierer tidligere registreringer inn i BabyEs. De gamle dataene blir bare lest, aldri endret."
+          "name": "Vises på kortet og enheten. Blir værende i din Home Assistant."
         }
       }
     },
@@ -66,10 +64,6 @@
         "timestamp": { "name": "Tidspunkt", "description": "Når flasken ble gitt. La stå tomt for nå." },
         "note": { "name": "Notat", "description": "Valgfritt notat." }
       }
-    },
-    "import_history": {
-      "name": "Importer tidligere historikk",
-      "description": "Kopierer registreringer fra de tidligere søvn- og flaskeintegrasjonene som ikke finnes i BabyEs ennå. De gamle dataene blir bare lest, aldri endret."
     }
   },
   "exceptions": {

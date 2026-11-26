@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="BabyEs">
+  <title>BabyEs</title>
+  <rect width="512" height="512" rx="116" fill="#F2F1ED"/>
+  <!-- crescent moon (sleep) -->
+  <path fill="#4A6378" d="M298 106a160 160 0 1 0 108 220a138 138 0 0 1-108-220z"/>
+  <!-- baby bottle (feeding), resting in the moon's curve -->
+  <g transform="translate(318 236) rotate(16)">
+    <path fill="#E2C27E" d="M-15 -126c0-22 30-22 30 0v14h-30z"/>
+    <rect x="-36" y="-114" width="72" height="26" rx="9" fill="#9C7A2B" stroke="#F2F1ED" stroke-width="10" paint-order="stroke"/>
+    <rect x="-46" y="-92" width="92" height="178" rx="32" fill="#C9A03A" stroke="#F2F1ED" stroke-width="10" paint-order="stroke"/>
+    <path d="M-28 -50h24M-28 -18h16M-28 14h24" stroke="#FFFFFF" stroke-opacity=".75" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <!-- two small stars -->
+  <circle cx="150" cy="122" r="9" fill="#C9A03A"/>
+  <circle cx="112" cy="176" r="5" fill="#C9A03A" opacity=".7"/>
+</svg>

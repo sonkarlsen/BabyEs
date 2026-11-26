@@ -5,12 +5,10 @@
         "title": "Set up BabyEs",
         "description": "A local sleep and bottle diary. Everything is stored in Home Assistant and included in your backups.",
         "data": {
-          "name": "Name",
-          "import_legacy": "Import history from the earlier sleep and bottle integrations"
+          "name": "Name"
         },
         "data_description": {
-          "name": "Shown on the card and the device. Stays in your Home Assistant.",
-          "import_legacy": "Copies earlier entries into BabyEs. The old data is only read, never changed."
+          "name": "Shown on the card and the device. Stays in your Home Assistant."
         }
       }
     },
@@ -66,10 +64,6 @@
         "timestamp": { "name": "Time", "description": "When the bottle was given. Leave empty for now." },
         "note": { "name": "Note", "description": "Optional note." }
       }
-    },
-    "import_history": {
-      "name": "Import earlier history",
-      "description": "Copies entries from the earlier sleep and bottle integrations that are not in BabyEs yet. The old data is only read, never changed."
     }
   },
   "exceptions": {

@@ -6,13 +6,12 @@ try:
 except ImportError:
     import voluptuous as vol
 
-from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse, callback
+from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, MAX_FEED_NOTE, MAX_ML
-from .migration import async_import_legacy
 from .runtime import get_runtime
 from .store import DiaryError, iso
 
@@ -55,10 +54,6 @@ def async_register_services(hass: HomeAssistant) -> None:
         except DiaryError as err:
             raise _fail(err) from err
 
-    async def import_history(call: ServiceCall):
-        result = await async_import_legacy(hass, _diary(hass), "service")
-        return {k: v for k, v in result.items() if k != "at"}
-
     hass.services.async_register(DOMAIN, "start_sleep", start_sleep,
                                  vol.Schema({vol.Optional("start"): cv.datetime}))
     hass.services.async_register(DOMAIN, "stop_sleep", stop_sleep, vol.Schema({}))
@@ -68,5 +63,3 @@ def async_register_services(hass: HomeAssistant) -> None:
         vol.Optional("timestamp"): cv.datetime,
         vol.Optional("note", default=""): vol.All(str, vol.Length(max=MAX_FEED_NOTE)),
     }))
-    hass.services.async_register(DOMAIN, "import_history", import_history, vol.Schema({}),
-                                 supports_response=SupportsResponse.OPTIONAL)

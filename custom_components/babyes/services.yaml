@@ -32,5 +32,3 @@ add_feed:
     note:
       selector:
         text:
-
-import_history:

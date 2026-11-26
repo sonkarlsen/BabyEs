@@ -9,7 +9,7 @@ except ImportError:
 from homeassistant import config_entries
 from homeassistant.core import callback
 
-from .const import CONF_IMPORT, CONF_NAME, DEFAULT_NAME, DOMAIN
+from .const import CONF_NAME, DEFAULT_NAME, DOMAIN
 
 
 def _name(value) -> str:
@@ -24,11 +24,9 @@ class BabyEsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
         if user_input is not None:
             name = _name(user_input.get(CONF_NAME))
-            return self.async_create_entry(
-                title=name, data={CONF_NAME: name, CONF_IMPORT: bool(user_input.get(CONF_IMPORT, True))})
+            return self.async_create_entry(title=name, data={CONF_NAME: name})
         return self.async_show_form(step_id="user", data_schema=vol.Schema({
             vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
-            vol.Required(CONF_IMPORT, default=True): bool,
         }))
 
     @staticmethod
