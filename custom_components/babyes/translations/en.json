@@ -1,0 +1,97 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up BabyEs",
+        "description": "A local sleep and bottle diary. Everything is stored in Home Assistant and included in your backups.",
+        "data": {
+          "name": "Name",
+          "import_legacy": "Import history from the earlier sleep and bottle integrations"
+        },
+        "data_description": {
+          "name": "Shown on the card and the device. Stays in your Home Assistant.",
+          "import_legacy": "Copies earlier entries into BabyEs. The old data is only read, never changed."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "BabyEs is already set up.",
+      "single_instance_allowed": "BabyEs is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "BabyEs",
+        "data": { "name": "Name" }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "sleeping": { "name": "Sleeping" }
+    },
+    "sensor": {
+      "sleep_today": { "name": "Sleep today" },
+      "sleep_week": { "name": "Sleep this week" },
+      "asleep_for": { "name": "Asleep for" },
+      "awake_for": { "name": "Awake for" },
+      "last_feed": { "name": "Last bottle" },
+      "feed_today": { "name": "Bottles today" },
+      "feed_today_breast_milk": { "name": "Breast milk today" },
+      "feed_today_formula": { "name": "Formula today" },
+      "feeds_today": { "name": "Number of bottles today" },
+      "feed_week": { "name": "Bottles this week" },
+      "feeds_week": { "name": "Number of bottles this week" }
+    }
+  },
+  "services": {
+    "start_sleep": {
+      "name": "Start sleep",
+      "description": "Starts a sleep period.",
+      "fields": {
+        "start": { "name": "Start", "description": "When the sleep started. Leave empty for now." }
+      }
+    },
+    "stop_sleep": {
+      "name": "Stop sleep",
+      "description": "Ends the ongoing sleep period now."
+    },
+    "add_feed": {
+      "name": "Add bottle",
+      "description": "Registers a bottle.",
+      "fields": {
+        "breast_milk_ml": { "name": "Breast milk", "description": "Amount of breast milk in ml." },
+        "formula_ml": { "name": "Formula", "description": "Amount of formula in ml." },
+        "timestamp": { "name": "Time", "description": "When the bottle was given. Leave empty for now." },
+        "note": { "name": "Note", "description": "Optional note." }
+      }
+    },
+    "import_history": {
+      "name": "Import earlier history",
+      "description": "Copies entries from the earlier sleep and bottle integrations that are not in BabyEs yet. The old data is only read, never changed."
+    }
+  },
+  "exceptions": {
+    "not_ready": { "message": "BabyEs is not set up or still loading." },
+    "invalid_time": { "message": "Invalid date or time." },
+    "no_timezone": { "message": "The time must include a time zone." },
+    "time_required": { "message": "Date and time are required." },
+    "feed_future": { "message": "A bottle cannot be more than one hour in the future." },
+    "sleep_future": { "message": "Sleep cannot start or end in the future." },
+    "end_before_start": { "message": "Wake-up must be after falling asleep." },
+    "too_long": { "message": "A single sleep period cannot exceed 48 hours." },
+    "ongoing_too_old": { "message": "An ongoing sleep cannot have started more than 48 hours ago." },
+    "end_required": { "message": "Choose when the sleep ended." },
+    "cannot_reopen": { "message": "A finished sleep period must keep its end time." },
+    "overlap": { "message": "The period overlaps another sleep period." },
+    "already_sleeping": { "message": "A sleep is already in progress." },
+    "not_sleeping": { "message": "There is no ongoing sleep to stop." },
+    "amount_invalid": { "message": "Amounts must be whole numbers between 0 and {max} ml." },
+    "amount_zero": { "message": "Register at least 1 ml." },
+    "note_too_long": { "message": "The note can be at most {max} characters." },
+    "not_found": { "message": "The entry was not found. Reload the history." },
+    "conflict": { "message": "The entry was changed on another device. Open it again." },
+    "corrupt": { "message": "The diary file has an invalid format. Restore from a backup." }
+  }
+}

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# Never commit Home Assistant data or secrets
+.storage/
+secrets.yaml
+*.db
+*.log

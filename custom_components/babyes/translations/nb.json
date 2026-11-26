@@ -1,0 +1,97 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sett opp BabyEs",
+        "description": "En lokal dagbok for søvn og flasker. Alt lagres i Home Assistant og er med i sikkerhetskopiene dine.",
+        "data": {
+          "name": "Navn",
+          "import_legacy": "Importer historikk fra de tidligere søvn- og flaskeintegrasjonene"
+        },
+        "data_description": {
+          "name": "Vises på kortet og enheten. Blir værende i din Home Assistant.",
+          "import_legacy": "Kopierer tidligere registreringer inn i BabyEs. De gamle dataene blir bare lest, aldri endret."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "BabyEs er allerede satt opp.",
+      "single_instance_allowed": "BabyEs er allerede satt opp."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "BabyEs",
+        "data": { "name": "Navn" }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "sleeping": { "name": "Sover" }
+    },
+    "sensor": {
+      "sleep_today": { "name": "Søvn i dag" },
+      "sleep_week": { "name": "Søvn denne uken" },
+      "asleep_for": { "name": "Har sovet i" },
+      "awake_for": { "name": "Har vært våken i" },
+      "last_feed": { "name": "Siste flaske" },
+      "feed_today": { "name": "Flaske i dag" },
+      "feed_today_breast_milk": { "name": "Brystmelk i dag" },
+      "feed_today_formula": { "name": "MME i dag" },
+      "feeds_today": { "name": "Antall flasker i dag" },
+      "feed_week": { "name": "Flaske denne uken" },
+      "feeds_week": { "name": "Antall flasker denne uken" }
+    }
+  },
+  "services": {
+    "start_sleep": {
+      "name": "Start søvn",
+      "description": "Starter en søvnperiode.",
+      "fields": {
+        "start": { "name": "Start", "description": "Når søvnen startet. La stå tomt for nå." }
+      }
+    },
+    "stop_sleep": {
+      "name": "Stopp søvn",
+      "description": "Avslutter den pågående søvnperioden nå."
+    },
+    "add_feed": {
+      "name": "Ny flaske",
+      "description": "Registrerer en flaske.",
+      "fields": {
+        "breast_milk_ml": { "name": "Brystmelk", "description": "Mengde brystmelk i ml." },
+        "formula_ml": { "name": "MME", "description": "Mengde morsmelkerstatning i ml." },
+        "timestamp": { "name": "Tidspunkt", "description": "Når flasken ble gitt. La stå tomt for nå." },
+        "note": { "name": "Notat", "description": "Valgfritt notat." }
+      }
+    },
+    "import_history": {
+      "name": "Importer tidligere historikk",
+      "description": "Kopierer registreringer fra de tidligere søvn- og flaskeintegrasjonene som ikke finnes i BabyEs ennå. De gamle dataene blir bare lest, aldri endret."
+    }
+  },
+  "exceptions": {
+    "not_ready": { "message": "BabyEs er ikke satt opp eller laster fortsatt." },
+    "invalid_time": { "message": "Ugyldig dato eller klokkeslett." },
+    "no_timezone": { "message": "Tidspunktet må ha tidssone." },
+    "time_required": { "message": "Dato og klokkeslett må fylles ut." },
+    "feed_future": { "message": "En flaske kan ikke være mer enn én time frem i tid." },
+    "sleep_future": { "message": "Søvn kan ikke starte eller slutte i fremtiden." },
+    "end_before_start": { "message": "Våknet må være etter sovnet." },
+    "too_long": { "message": "En søvnperiode kan ikke være lengre enn 48 timer." },
+    "ongoing_too_old": { "message": "En pågående søvn kan ikke ha startet for mer enn 48 timer siden." },
+    "end_required": { "message": "Velg når søvnen sluttet." },
+    "cannot_reopen": { "message": "En avsluttet søvnperiode må ha sluttid." },
+    "overlap": { "message": "Perioden overlapper en annen søvnperiode." },
+    "already_sleeping": { "message": "En søvn pågår allerede." },
+    "not_sleeping": { "message": "Det er ingen pågående søvn å stoppe." },
+    "amount_invalid": { "message": "Mengder må være hele tall mellom 0 og {max} ml." },
+    "amount_zero": { "message": "Registrer minst 1 ml." },
+    "note_too_long": { "message": "Notatet kan være opptil {max} tegn." },
+    "not_found": { "message": "Fant ikke registreringen. Last inn historikken på nytt." },
+    "conflict": { "message": "Registreringen er endret på en annen enhet. Åpne den på nytt." },
+    "corrupt": { "message": "Dagbokfilen har ugyldig format. Gjenopprett fra en sikkerhetskopi." }
+  }
+}

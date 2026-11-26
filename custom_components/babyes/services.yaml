@@ -1,0 +1,36 @@
+start_sleep:
+  fields:
+    start:
+      selector:
+        datetime:
+
+stop_sleep:
+
+add_feed:
+  fields:
+    breast_milk_ml:
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: 5
+          unit_of_measurement: ml
+          mode: box
+    formula_ml:
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: 5
+          unit_of_measurement: ml
+          mode: box
+    timestamp:
+      selector:
+        datetime:
+    note:
+      selector:
+        text:
+
+import_history:
