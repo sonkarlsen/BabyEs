@@ -2,6 +2,14 @@
 
 Each release says whether Home Assistant needs a restart. Card-only updates only need a reload of the dashboard.
 
+## 0.2.2
+
+Restart needed: **no** if 0.2.1 is already installed and Home Assistant has been restarted once since. Coming from 0.2.0 or earlier: yes, once.
+
+### Card
+- Stopping a sleep now asks for confirmation first, showing how long the baby has slept. Starting a sleep is still one tap.
+- The card is about 15 % lower: tighter spacing and slightly smaller text and buttons.
+
 ## 0.2.1
 
 Restart needed: **yes**, once. After this, updates that only change the card need just a page reload.

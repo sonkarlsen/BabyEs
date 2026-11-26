@@ -15,7 +15,7 @@
 (() => {
   "use strict";
   const TAG = "babyes-card";
-  const VERSION = "0.2.1";
+  const VERSION = "0.2.2";
   if (customElements.get(TAG)) return;
 
   /* ---------- language ---------- */
@@ -26,6 +26,7 @@
       period1Today: "1 periode i dag", periodsToday: "{n} perioder i dag", noSleepToday: "Ingen søvn i dag",
       lastAt: "Siste kl. {t}", noBottleToday: "Ingen flasker i dag",
       showTimeline: "Vis tidslinje", hideTimeline: "Skjul tidslinje",
+      confirmStopTitle: "Stoppe søvn?", confirmStopText: "{name} har sovet i {d}, siden kl. {t}. Søvnen avsluttes nå.",
       timelineAria: "Døgnet i dag: søvn og flasker", legendSleep: "Søvn", legendFeed: "Flaske",
       loadFailed: "Kunne ikke hente data", noSleepYet: "Ingen søvn registrert ennå",
       startSleep: "Start søvn", stopSleep: "Stopp søvn", newBottle: "Ny flaske",
@@ -85,6 +86,7 @@
       period1Today: "1 period today", periodsToday: "{n} periods today", noSleepToday: "No sleep today",
       lastAt: "Last at {t}", noBottleToday: "No bottles today",
       showTimeline: "Show timeline", hideTimeline: "Hide timeline",
+      confirmStopTitle: "Stop sleep?", confirmStopText: "{name} has slept for {d}, since {t}. The sleep ends now.",
       timelineAria: "Today on a 24-hour line: sleep and bottles", legendSleep: "Sleep", legendFeed: "Bottle",
       loadFailed: "Could not load data", noSleepYet: "No sleep registered yet",
       startSleep: "Start sleep", stopSleep: "Stop sleep", newBottle: "New bottle",
@@ -331,15 +333,15 @@
   .ico{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
   /* card: background, border, radius and shadow come from ha-card / the theme */
   ha-card.be{overflow:hidden;color:var(--be-ink)}
-  .top{padding:16px 16px 0;display:flex;flex-direction:column}
-  .slot{margin-top:14px}
+  .top{padding:12px 14px 0;display:flex;flex-direction:column}
+  .slot{margin-top:10px}
   .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .state{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .state{display:flex;flex-direction:column;min-width:0}
   .eyebrow{font-size:12px;line-height:16px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--be-sleep-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .headline{margin:0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-.01em}
+  .headline{margin:0;font-size:22px;line-height:1.2;font-weight:600;letter-spacing:-.01em}
   .sub{font-size:14px;color:var(--be-muted)}
-  .badge{width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--be-sleep) 14%,var(--be-card));color:var(--be-sleep-ink)}
-  .strip{width:100%;min-height:58px;display:flex;align-items:center;gap:8px;padding:10px 8px 10px 14px;border:0;border-radius:12px;background:var(--be-soft);text-align:left;transition:background-color .15s ease}
+  .badge{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--be-sleep) 14%,var(--be-card));color:var(--be-sleep-ink)}
+  .strip{width:100%;min-height:48px;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border:0;border-radius:12px;background:var(--be-soft);text-align:left;transition:background-color .15s ease}
   .strip:hover{background:color-mix(in srgb,var(--be-ink) 8%,var(--be-card))}
   .halves{flex:1;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
   .half{min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -350,19 +352,19 @@
   .half .s{font-size:13px;color:var(--be-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .half .s b{color:var(--be-feed-ink);font-weight:600}
   .strip>.ico{color:var(--be-muted)}
-  .toast{min-height:58px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:12px;background:var(--be-ok);color:var(--be-ok-ink);font-size:14px;font-weight:600;animation:be-pop .28s ease}
+  .toast{min-height:48px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:12px;background:var(--be-ok);color:var(--be-ok-ink);font-size:14px;font-weight:600;animation:be-pop .28s ease}
   .toast.err{background:color-mix(in srgb,var(--be-danger) 16%,var(--be-card))}
   .toast span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .toast button{min-height:40px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:inherit;font-size:14px;font-weight:700;text-decoration:underline}
-  .tl-toggle{align-self:flex-end;min-height:40px;margin:2px -6px 0 0;padding:0 6px;border:0;border-radius:8px;background:none;color:var(--be-sleep-ink);font-size:13px;font-weight:600;display:flex;align-items:center;gap:2px}
+  .tl-toggle{align-self:flex-end;min-height:36px;margin:0 -6px 0 0;padding:0 6px;border:0;border-radius:8px;background:none;color:var(--be-sleep-ink);font-size:13px;font-weight:600;display:flex;align-items:center;gap:2px}
   .tl-toggle .ico{transition:transform .28s ease}
   .tl-toggle[aria-expanded=true] .ico{transform:rotate(180deg)}
   .tl-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.2,.8,.2,1)}
   .tl-wrap.open{grid-template-rows:1fr}
   .tl-wrap>div{overflow:hidden;min-height:0}
-  .tl{display:flex;flex-direction:column;gap:6px;padding:4px 0 6px;opacity:0;transform:translateY(-4px);transition:opacity .2s ease,transform .3s ease}
+  .tl{display:flex;flex-direction:column;gap:4px;padding:2px 0 4px;opacity:0;transform:translateY(-4px);transition:opacity .2s ease,transform .3s ease}
   .tl-wrap.open .tl{opacity:1;transform:none;transition-delay:.08s}
-  .track{position:relative;height:26px;margin:4px 0}
+  .track{position:relative;height:22px;margin:3px 0}
   .track .bg{position:absolute;inset:0;border-radius:8px;background:var(--be-soft);overflow:hidden}
   .track i{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--be-sleep)}
   .track i.live{opacity:.6;border-radius:6px 0 0 6px}
@@ -374,8 +376,8 @@
   .legend span{display:flex;align-items:center;gap:6px}
   .legend i{width:10px;height:10px;border-radius:3px;background:var(--be-sleep)}
   .legend b{width:6px;height:14px;border-radius:3px;background:var(--be-feed)}
-  .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:6px;border-top:1px solid var(--be-line)}
-  .act{min-height:52px;border:0;background:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;transition:background-color .15s ease}
+  .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:4px;border-top:1px solid var(--be-line)}
+  .act{min-height:44px;border:0;background:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;transition:background-color .15s ease}
   .act:hover{background:var(--be-soft)}
   .act:active{background:color-mix(in srgb,var(--be-ink) 9%,var(--be-card))}
   .act.sleep{color:var(--be-sleep-ink)}
@@ -701,7 +703,7 @@
       this._cardEl.innerHTML = `<ha-card class="be">
         <div class="top">
           <div class="head"><div class="state"><span class="eyebrow">${esc(name)}</span><h2 class="headline">${esc(headline)}</h2><span class="sub">${esc(since)}</span></div>
-            <span class="badge" aria-hidden="true">${icon(ongoing ? "moon" : "sun", 22)}</span></div>
+            <span class="badge" aria-hidden="true">${icon(ongoing ? "moon" : "sun", 20)}</span></div>
           <div class="slot" role="status" aria-live="polite">${slot}</div>
           <button type="button" class="tl-toggle" data-action="timeline" aria-expanded="${open}" aria-controls="tl" ${!ready ? "disabled" : ""}>${esc(open ? t("hideTimeline") : t("showTimeline"))}${icon("down", 16)}</button>
           ${timeline}
@@ -764,6 +766,17 @@
       if (p === "feed" || p === "edit-feed") { title = p === "feed" ? t("newBottle") : t("editBottle"); body = this._feedForm(); }
       else if (p === "edit-sleep" || p === "add-sleep") { title = p === "add-sleep" ? t("addSleep") : t("editSleep"); body = this._sleepForm(); }
       else if (p === "history") { title = this._name; top = this._historyTop(); body = this._historyBody(); }
+      else if (p === "confirm-stop") {
+        const o = this._ongoing();
+        if (!o) { this._closeSheet(); return; } // the sleep already ended elsewhere
+        const s = Date.parse(o.start);
+        title = t("confirmStopTitle");
+        body = `<div class="section bare">
+          <p class="msg" style="margin:0;font-size:15px;color:var(--be-ink)">${esc(t("confirmStopText", { name: this._name, d: dur((Date.now() - s) / 60000), t: hm(s) }))}</p>
+          <div class="row" style="flex-wrap:nowrap"><button type="button" class="ghost" style="flex:1" data-action="close">${esc(t("cancel"))}</button>
+          <button type="button" class="save" style="flex:1;min-height:48px;font-size:16px" data-action="confirm-stop" ${this._busy ? "disabled" : ""}>${esc(t("stopSleep"))}</button></div>
+        </div>`;
+      }
       const back = p === "edit-feed" || p === "edit-sleep" || p === "add-sleep";
       const scrollTop = this._sheet.querySelector(".scroll")?.scrollTop || 0;
       this._sheet.setAttribute("aria-label", title);
@@ -929,7 +942,9 @@
       const step = this._config.step;
       switch (a) {
         case "retry": this._reload(); return;
-        case "toggle-sleep": return this._toggleSleep();
+        // Starting sleep is instant; stopping asks first.
+        case "toggle-sleep": return this._ongoing() ? this._openPane("confirm-stop") : this._toggleSleep();
+        case "confirm-stop": this._closeSheet(); return this._toggleSleep();
         case "undo": return this._undo();
         case "open-feed":
           return this._openPane("feed", { breast: 0, formula: 0, when: "now", time: localInput(new Date(Date.now() - 30 * 60000)), note: "", error: "" });

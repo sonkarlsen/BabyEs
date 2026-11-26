@@ -1,7 +1,7 @@
 """Constants for BabyEs."""
 
 DOMAIN = "babyes"
-VERSION = "0.2.1"
+VERSION = "0.2.2"
 
 STORAGE_KEY = "babyes.diary"
 STORAGE_VERSION = 1
