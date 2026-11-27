@@ -15,7 +15,7 @@
 (() => {
   "use strict";
   const TAG = "babyes-card";
-  const VERSION = "0.2.2";
+  const VERSION = "0.3.0";
   if (customElements.get(TAG)) return;
 
   /* ---------- language ---------- */
@@ -32,7 +32,11 @@
       startSleep: "Start søvn", stopSleep: "Stopp søvn", newBottle: "Ny flaske",
       lastBottle: "Siste flaske", today: "I dag", noneYet: "Ingen ennå", mlAt: "{ml} ml kl. {t}",
       historyAria: "Historikk og grafer. Siste flaske {last}. I dag {ml} ml og {sleep} søvn",
-      undo: "Angre", retry: "Prøv igjen", undone: "Angret",
+      undo: "Angre", retry: "Prøv igjen", undone: "Angret", dismiss: "Lukk varselet",
+      changeStart: "Endre", changeStartAria: "Endre når søvnen startet", adjustTitle: "Når sovnet {name}?",
+      adjustText: "Søvnen ble registrert kl. {t}. Velg når {name} faktisk sovnet.", minEarlier: "−{n} min",
+      startAt: "Sovnet kl.", saveStart: "Lagre, sovnet kl. {t}", startChanged: "Søvnen startet kl. {t}",
+      typeAmount: "{label} i ml. Skriv inn mengden.",
       sleepStarted: "Søvn startet {t}", sleepStopped: "Søvn stoppet {t}", mlSaved: "{ml} ml er lagret",
       feedChanged: "Flasken er endret", sleepAdded: "Søvn er lagt til", sleepChanged: "Søvnen er endret",
       feedDeleted: "Flasken er slettet", sleepDeleted: "Søvnperioden er slettet",
@@ -92,7 +96,11 @@
       startSleep: "Start sleep", stopSleep: "Stop sleep", newBottle: "New bottle",
       lastBottle: "Last bottle", today: "Today", noneYet: "None yet", mlAt: "{ml} ml at {t}",
       historyAria: "History and charts. Last bottle {last}. Today {ml} ml and {sleep} of sleep",
-      undo: "Undo", retry: "Try again", undone: "Undone",
+      undo: "Undo", retry: "Try again", undone: "Undone", dismiss: "Dismiss",
+      changeStart: "Change", changeStartAria: "Change when the sleep started", adjustTitle: "When did {name} fall asleep?",
+      adjustText: "The sleep was registered at {t}. Choose when {name} actually fell asleep.", minEarlier: "−{n} min",
+      startAt: "Fell asleep at", saveStart: "Save, asleep at {t}", startChanged: "Sleep started at {t}",
+      typeAmount: "{label} in ml. Type the amount.",
       sleepStarted: "Sleep started {t}", sleepStopped: "Sleep stopped {t}", mlSaved: "{ml} ml saved",
       feedChanged: "Bottle updated", sleepAdded: "Sleep added", sleepChanged: "Sleep updated",
       feedDeleted: "Bottle deleted", sleepDeleted: "Sleep period deleted",
@@ -253,6 +261,25 @@
     });
     return best ? best.raw : "";
   };
+  // Formula gets its own theme colour, as far as possible from both the
+  // breast-milk colour and the sleep colour, so the two never look alike.
+  const pickFormulaColour = (el) => {
+    const cs = getComputedStyle(el);
+    if (cs.getPropertyValue("--babyes-formula-color").trim()) return "";
+    const milk = toRgb(cs.getPropertyValue("--be-milk"));
+    if (!milk) return "";
+    const sleep = toRgb(cs.getPropertyValue("--be-sleep"));
+    let best = null;
+    FEED_CANDIDATES.forEach((name, i) => {
+      const raw = cs.getPropertyValue(name).trim();
+      const rgb = toRgb(raw);
+      if (!rgb || hsl(rgb)[1] < 0.25) return;
+      const gap = Math.min(colourGap(milk, rgb), sleep ? colourGap(sleep, rgb) * 1.15 : 1);
+      const score = gap - i * 0.005;
+      if (!best || score > best.score) best = { raw, score, gap };
+    });
+    return best && best.gap >= 0.2 ? best.raw : "";
+  };
 
   /* ---------- 24 h dial ---------- */
   const pt = (c, h, r) => { const a = (h / 24) * Math.PI * 2; return [c + r * Math.sin(a), c - r * Math.cos(a)]; };
@@ -318,7 +345,8 @@
     --be-sleep-ink:color-mix(in srgb,var(--be-sleep) 72%,var(--be-ink));
     --be-feed-ink:color-mix(in srgb,var(--be-feed) 62%,var(--be-ink));
     --be-milk:var(--babyes-milk-color,var(--be-feed));
-    --be-formula:var(--babyes-formula-color,color-mix(in srgb,var(--be-feed) 45%,var(--be-card)));
+    /* --be-formula-auto: a second theme colour picked in JS, far from both milk and sleep */
+    --be-formula:var(--babyes-formula-color,var(--be-formula-auto,color-mix(in srgb,var(--be-feed) 50%,var(--be-ink))));
     --be-soft:color-mix(in srgb,var(--be-ink) 5%,var(--be-card));
     --be-sheet:var(--primary-background-color,#fafafa);--be-section:var(--be-card);
     --be-field:color-mix(in srgb,var(--be-ink) 7%,var(--be-section));
@@ -355,7 +383,10 @@
   .toast{min-height:48px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;border-radius:12px;background:var(--be-ok);color:var(--be-ok-ink);font-size:14px;font-weight:600;animation:be-pop .28s ease}
   .toast.err{background:color-mix(in srgb,var(--be-danger) 16%,var(--be-card))}
   .toast span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .toast button{min-height:40px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:inherit;font-size:14px;font-weight:700;text-decoration:underline}
+  .toast button{min-height:40px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:inherit;font-size:14px;font-weight:700;text-decoration:underline;flex:none}
+  .toast button:hover{background:color-mix(in srgb,var(--be-ink) 8%,transparent)}
+  .toast button.x{width:40px;padding:0;display:grid;place-items:center;text-decoration:none}
+  .toast button.x .ico{stroke-width:2.2}
   .tl-toggle{align-self:flex-end;min-height:36px;margin:0 -6px 0 0;padding:0 6px;border:0;border-radius:8px;background:none;color:var(--be-sleep-ink);font-size:13px;font-weight:600;display:flex;align-items:center;gap:2px}
   .tl-toggle .ico{transition:transform .28s ease}
   .tl-toggle[aria-expanded=true] .ico{transform:rotate(180deg)}
@@ -387,7 +418,10 @@
   dialog.sheet{position:fixed;inset:auto 0 0 0;margin:0 auto;width:min(560px,100vw);max-width:100vw;max-height:92dvh;padding:0;border:0;border-radius:28px 28px 0 0;background:var(--be-sheet);color:var(--be-ink);overflow:hidden}
   dialog.sheet::backdrop{background:rgba(20,20,24,.45)}
   .sheet-in{display:flex;flex-direction:column;max-height:92dvh}
-  .sheet-top{padding:10px 16px 12px;display:flex;flex-direction:column;gap:12px}
+  .sheet-top{padding:10px 16px 12px;display:flex;flex-direction:column;gap:12px;touch-action:none;cursor:grab}
+  .sheet-top button{cursor:pointer}
+  dialog.sheet.dragging{animation:none;cursor:grabbing}
+  dialog.sheet.dragout::backdrop{animation:be-fade-out .22s ease forwards}
   .grab{align-self:center;width:40px;height:5px;border-radius:3px;background:var(--be-line)}
   .titlebar{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .titlebar h2{margin:0;font-size:22px;font-weight:700}
@@ -408,8 +442,20 @@
   .stepper{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 18px;border-radius:999px}
   .stepper.milk{background:color-mix(in srgb,var(--be-milk) 18%,var(--be-section))}
   .stepper.formula{background:color-mix(in srgb,var(--be-formula) 20%,var(--be-section))}
-  .stepper .name{flex:1;font-size:17px;font-weight:600}
-  .stepper .val{width:84px;text-align:center;font-size:24px;font-weight:700}.stepper .val small{font-size:14px;font-weight:500}
+  .stepper .name{flex:1;min-width:0;font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .stepper .name::before{content:"";width:10px;height:10px;border-radius:50%;flex:none;background:var(--be-milk)}
+  .stepper.formula .name::before{background:var(--be-formula)}
+  .t-milk span::before,.t-formula span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--be-milk)}
+  .t-formula span::before{background:var(--be-formula)}
+  .stepper .val{width:96px;display:flex;align-items:baseline;justify-content:center;gap:3px;font-size:24px;font-weight:700}.stepper .val small{font-size:14px;font-weight:500}
+  /* the number is a field: tap it to type an amount */
+  .stepper .val input{width:3.4ch;min-width:0;padding:2px 0;border:0;border-bottom:2px dashed color-mix(in srgb,var(--be-ink) 28%,transparent);border-radius:0;background:transparent;color:inherit;font:inherit;text-align:center;font-variant-numeric:tabular-nums;cursor:text;-moz-appearance:textfield}
+  .stepper .val input:focus{outline:none;border-bottom-style:solid;border-bottom-color:var(--be-accent)}
+  .stepper .val input::-webkit-inner-spin-button,.stepper .val input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chips .chip{align-self:auto}
+  .chip[aria-pressed=true]{border-color:var(--be-accent);background:color-mix(in srgb,var(--be-accent) 14%,var(--be-section));color:var(--be-ink)}
+  .field input[type=time]{max-width:180px;font-size:20px;font-weight:600}
   .stepper button{width:48px;height:48px;border:0;border-radius:50%;background:var(--be-section);display:grid;place-items:center}
   .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   label.field{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--be-muted)}
@@ -504,14 +550,86 @@
       this._sheet = this.shadowRoot.getElementById("sheet");
       this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
       this.shadowRoot.addEventListener("input", (e) => this._onInput(e));
+      this.shadowRoot.addEventListener("focusin", (e) => this._onFocus(e));
+      this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
+      // Enter in an amount field closes the keyboard instead of doing nothing.
+      this.shadowRoot.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target?.dataset?.ml) e.target.blur(); });
       this._sheet.addEventListener("close", () => {
         clearTimeout(this._closeTimer); clearTimeout(this._introTimer);
-        this._sheet.classList.remove("closing", "intro", "swap");
+        this._sheet.classList.remove("closing", "intro", "swap", "dragging", "dragout");
+        this._sheet.style.transform = ""; this._sheet.style.transition = "";
         this._pane = null; this._form = null; this._sheet.innerHTML = "";
       });
+      this._initSwipe();
       // Escape and a tap on the dimmed backdrop close with the slide-down animation.
       this._sheet.addEventListener("cancel", (e) => { e.preventDefault(); this._closeSheet(); });
       this._sheet.addEventListener("click", (e) => { if (e.target === this._sheet) this._closeSheet(); });
+    }
+
+    // Swipe the sheet down to close it: from the handle and title anywhere,
+    // and from the content when it is scrolled to the top.
+    _initSwipe() {
+      const sheet = this._sheet;
+      let d = null;
+      const begin = (y, target) => {
+        if (!sheet.open || sheet.classList.contains("closing")) return;
+        if (target.closest?.("input,textarea,select")) return;
+        const scroll = target.closest?.(".scroll");
+        d = { y0: y, y: y, t0: performance.now(), scroll, on: false };
+      };
+      const move = (y, ev) => {
+        if (!d) return;
+        const dy = y - d.y0;
+        d.y = y;
+        if (!d.on) {
+          if (dy < -6) { d = null; return; } // scrolling up: leave it to the content
+          if (dy < 8) return;
+          if (d.scroll && d.scroll.scrollTop > 0) { d = null; return; }
+          d.on = true;
+          d.y0 = y; // start from here, so the sheet does not jump
+          d.t0 = performance.now();
+          sheet.classList.add("dragging");
+          sheet.style.transition = "none";
+        }
+        if (ev.cancelable) ev.preventDefault();
+        sheet.style.transform = `translateY(${Math.max(0, y - d.y0)}px)`;
+      };
+      const end = () => {
+        if (!d) return;
+        const g = d; d = null;
+        if (!g.on) return;
+        this._dragJustEnded = true;
+        setTimeout(() => { this._dragJustEnded = false; }, 60);
+        const dy = Math.max(0, g.y - g.y0);
+        const speed = dy / Math.max(1, performance.now() - g.t0);
+        sheet.classList.remove("dragging");
+        if (dy > Math.min(140, sheet.offsetHeight * 0.3) || (speed > 0.6 && dy > 30)) {
+          sheet.classList.add("dragout");
+          sheet.style.transition = "transform .22s cubic-bezier(.4,0,1,1)";
+          sheet.style.transform = "translateY(100%)";
+          clearTimeout(this._closeTimer);
+          this._closeTimer = setTimeout(() => { if (sheet.open) sheet.close(); }, 220);
+        } else {
+          sheet.style.transition = "transform .3s cubic-bezier(.32,.72,0,1)";
+          sheet.style.transform = "";
+          setTimeout(() => { if (!sheet.classList.contains("dragout")) sheet.style.transition = ""; }, 320);
+        }
+      };
+      sheet.addEventListener("touchstart", (e) => { if (e.touches.length === 1) begin(e.touches[0].clientY, e.target); else d = null; }, { passive: true });
+      sheet.addEventListener("touchmove", (e) => { if (e.touches.length === 1) move(e.touches[0].clientY, e); }, { passive: false });
+      sheet.addEventListener("touchend", end);
+      sheet.addEventListener("touchcancel", end);
+      // Mouse: drag the handle or title bar.
+      sheet.addEventListener("pointerdown", (e) => {
+        if (e.pointerType !== "mouse" || e.button !== 0 || !e.target.closest?.(".sheet-top") || e.target.closest("button")) return;
+        begin(e.clientY, e.target);
+        const mv = (ev) => move(ev.clientY, ev);
+        const up = () => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); end(); };
+        window.addEventListener("pointermove", mv);
+        window.addEventListener("pointerup", up);
+      });
+      // A drag that ends over the backdrop must not count as a tap on it.
+      sheet.addEventListener("click", (e) => { if (this._dragJustEnded) e.stopImmediatePropagation(); }, true);
     }
 
     static getStubConfig() { return { step: 5 }; }
@@ -559,10 +677,16 @@
     _applyFeedColour() {
       if (!this.isConnected) return;
       const c = pickFeedColour(this);
-      if (c === this._feedColour) return;
-      this._feedColour = c;
-      if (c) this.style.setProperty("--be-feed-auto", c);
-      else this.style.removeProperty("--be-feed-auto");
+      if (c !== this._feedColour) {
+        this._feedColour = c;
+        if (c) this.style.setProperty("--be-feed-auto", c);
+        else this.style.removeProperty("--be-feed-auto");
+      }
+      const f = pickFormulaColour(this);
+      if (f === this._formulaColour) return;
+      this._formulaColour = f;
+      if (f) this.style.setProperty("--be-formula-auto", f);
+      else this.style.removeProperty("--be-formula-auto");
     }
     get hass() { return this._hass; }
     connectedCallback() {
@@ -670,7 +794,11 @@
       // The strip and the toast share one slot, so the card never jumps in height.
       let slot;
       if (this._toast) {
-        slot = `<div class="toast${this._toast.error ? " err" : ""}">${icon(this._toast.error ? "close" : "check", 19)}<span>${esc(this._toast.text)}</span>${this._toast.undo ? `<button type="button" data-action="undo" ${this._busy ? "disabled" : ""}>${esc(t("undo"))}</button>` : ""}</div>`;
+        const ts = this._toast;
+        slot = `<div class="toast${ts.error ? " err" : ""}">${icon(ts.error ? "close" : "check", 19)}<span>${esc(ts.text)}</span>`
+          + (ts.adjust ? `<button type="button" data-action="adjust-start" aria-label="${esc(t("changeStartAria"))}" ${this._busy ? "disabled" : ""}>${esc(t("changeStart"))}</button>` : "")
+          + (ts.undo ? `<button type="button" data-action="undo" ${this._busy ? "disabled" : ""}>${esc(t("undo"))}</button>` : "")
+          + `<button type="button" class="x" data-action="dismiss-toast" aria-label="${esc(t("dismiss"))}">${icon("close", 18)}</button></div>`;
       } else if (this._loadErr && !ready) {
         slot = `<div class="toast err">${icon("close", 19)}<span>${esc(this._loadErr)}</span><button type="button" data-action="retry">${esc(t("retry"))}</button></div>`;
       } else {
@@ -727,11 +855,19 @@
       btn.firstChild.textContent = this._timeline ? t("hideTimeline") : t("showTimeline");
     }
 
-    _showToast(text, undo = null, error = false) {
+    // Short-lived: 2 s, 4 s when it offers Undo or Change, 8 s for errors. The × closes it at once.
+    _showToast(text, undo = null, error = false, adjust = null) {
       clearTimeout(this._toastTimer);
-      this._toast = { text, undo, error };
+      this._toast = { text, undo, error, adjust };
       this._renderCard();
-      this._toastTimer = setTimeout(() => { this._toast = null; this._renderCard(); }, error ? 10000 : 8000);
+      const ms = error ? 8000 : undo || adjust ? 4000 : 2000;
+      this._toastTimer = setTimeout(() => this._dismissToast(), ms);
+    }
+    _dismissToast() {
+      clearTimeout(this._toastTimer);
+      if (!this._toast) return;
+      this._toast = null;
+      this._renderCard();
     }
 
     /* ---------- sheet ---------- */
@@ -766,6 +902,12 @@
       if (p === "feed" || p === "edit-feed") { title = p === "feed" ? t("newBottle") : t("editBottle"); body = this._feedForm(); }
       else if (p === "edit-sleep" || p === "add-sleep") { title = p === "add-sleep" ? t("addSleep") : t("editSleep"); body = this._sleepForm(); }
       else if (p === "history") { title = this._name; top = this._historyTop(); body = this._historyBody(); }
+      else if (p === "adjust-start") {
+        const rec = this._sleep.find((r) => r.id === this._form.id);
+        if (!rec || rec.end) { this._closeSheet(); return; } // ended or deleted elsewhere
+        title = t("adjustTitle", { name: this._name });
+        body = this._adjustForm();
+      }
       else if (p === "confirm-stop") {
         const o = this._ongoing();
         if (!o) { this._closeSheet(); return; } // the sleep already ended elsewhere
@@ -797,7 +939,7 @@
         ? `<button type="button" class="chip" data-action="use-last">${esc(t("sameAsLast", { b: num(last.e.breast_milk_ml), f: num(last.e.formula_ml) }))}</button>` : "";
       const stepper = (key, label, cls) => `<div class="stepper ${cls}"><span class="name">${esc(label)}</span>
         <button type="button" data-action="step" data-key="${key}" data-d="-1" aria-label="${esc(t("less", { step, label }))}">${icon("minus")}</button>
-        <span class="val${this._bump === key ? " bump" : ""}" aria-live="polite">${esc(f[key])}<small> ml</small></span>
+        <span class="val${this._bump === key ? " bump" : ""}"><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" data-ml="${key}" value="${esc(f[key])}" aria-label="${esc(t("typeAmount", { label }))}"><small>ml</small></span>
         <button type="button" data-action="step" data-key="${key}" data-d="1" aria-label="${esc(t("more", { step, label }))}">${icon("plus")}</button></div>`;
       const timeField = `<label class="field">${esc(t("time"))}<input type="datetime-local" data-field="time" value="${esc(f.time)}"></label>`;
       const timeRow = isNew
@@ -829,6 +971,44 @@
         <button type="button" class="save" data-action="save-sleep" ${this._busy ? "disabled" : ""}>${esc(isAdd ? t("addSleep") : t("saveChange"))}</button>
         ${isAdd ? "" : this._deleteControls("sleep")}
       </div>`;
+    }
+
+    // Quick fix for a sleep that was started late: pick "−15 min" or type the time.
+    _adjustForm() {
+      const f = this._form;
+      const chosen = this._adjustTarget();
+      const chips = [5, 10, 15, 20, 30, 45].map((n) => `<button type="button" class="chip" data-action="adjust-by" data-n="${n}" aria-pressed="${f.by === n}">${esc(t("minEarlier", { n }))}</button>`).join("");
+      return `<div class="section bare">
+        <p class="msg" style="margin:0;font-size:15px;color:var(--be-ink)">${esc(t("adjustText", { t: hm(f.base), name: this._name }))}</p>
+        <div class="chips">${chips}</div>
+        <label class="field">${esc(t("startAt"))}<input type="time" data-field="time" data-adjust="1" value="${esc(f.time)}"></label>
+        ${f.error ? `<div class="error" role="alert">${esc(f.error)}</div>` : ""}
+        <button type="button" class="save" data-action="save-start" ${this._busy || chosen === null ? "disabled" : ""}>${esc(chosen === null ? t("validTime") : t("saveStart", { t: hm(chosen) }))}</button>
+      </div>`;
+    }
+    // The chosen start as a timestamp: that time on the registered day, or the day before if it is still ahead.
+    _adjustTarget() {
+      const m = /^(\d{1,2}):(\d{2})/.exec(this._form?.time || "");
+      if (!m) return null;
+      const d = new Date(this._form.base);
+      d.setHours(Number(m[1]), Number(m[2]), 0, 0);
+      if (d.getTime() > Date.now() + 60000) d.setDate(d.getDate() - 1);
+      return d.getTime();
+    }
+    async _saveStart() {
+      const f = this._form;
+      const at = this._adjustTarget();
+      if (at === null) { f.error = t("validTime"); this._renderSheet(); return; }
+      const rec = this._sleep.find((r) => r.id === f.id);
+      if (!rec) { this._closeSheet(); return; }
+      await this._run(async () => {
+        try {
+          await this._ws({ type: "babyes/sleep/update", entry_id: rec.id, expected_updated_at: rec.updated_at, start: new Date(at).toISOString(), end: null, note: rec.note || "" });
+          this._closeSheet();
+          await this._reload();
+          this._showToast(t("startChanged", { t: hm(at) }));
+        } catch (err) { if (this._form) { this._form.error = errText(err); this._renderSheet(); } else this._showToast(errText(err), null, true); }
+      });
     }
 
     _deleteControls(kind) {
@@ -931,8 +1111,40 @@
     /* ---------- events ---------- */
     _onInput(e) {
       const el = e.target;
-      if (!this._form || !el.dataset?.field) return;
+      if (!this._form) return;
+      if (el.dataset?.ml) {
+        // Typed amount: digits only, 0–1000 ml. Update the save button in place so the field keeps focus.
+        const digits = el.value.replace(/\D/g, "").slice(0, 4);
+        if (digits !== el.value) el.value = digits;
+        this._form[el.dataset.ml] = clampMl(digits || 0);
+        this._form.error = "";
+        this._syncFeedSave();
+        return;
+      }
+      if (!el.dataset?.field) return;
       this._form[el.dataset.field] = el.value;
+      if (el.dataset.adjust) {
+        this._form.by = null;
+        this._sheet.querySelectorAll("[data-action=adjust-by]").forEach((b) => b.setAttribute("aria-pressed", "false"));
+        const at = this._adjustTarget(), btn = this._sheet.querySelector("[data-action=save-start]");
+        if (btn) { btn.disabled = this._busy || at === null; btn.textContent = at === null ? t("validTime") : t("saveStart", { t: hm(at) }); }
+      }
+    }
+    _syncFeedSave() {
+      const f = this._form, btn = this._sheet.querySelector("[data-action=save-feed]");
+      if (!f || !btn) return;
+      const total = f.breast + f.formula;
+      btn.disabled = total === 0 || this._busy;
+      btn.textContent = total === 0 ? t("chooseAmount") : (this._pane === "feed" ? t("save", { ml: total }) : t("saveChangeMl", { ml: total }));
+    }
+    // Tapping the number selects it, so typing replaces it.
+    _onFocus(e) {
+      const el = e.target;
+      if (el?.dataset?.ml) setTimeout(() => { try { el.select(); } catch (_) { /* gone */ } }, 0);
+    }
+    _onChange(e) {
+      const el = e.target;
+      if (el?.dataset?.ml && this._form) el.value = String(this._form[el.dataset.ml]); // show the clamped value
     }
 
     async _onClick(e) {
@@ -946,6 +1158,20 @@
         case "toggle-sleep": return this._ongoing() ? this._openPane("confirm-stop") : this._toggleSleep();
         case "confirm-stop": this._closeSheet(); return this._toggleSleep();
         case "undo": return this._undo();
+        case "dismiss-toast": this._dismissToast(); return;
+        case "adjust-start": {
+          const rec = this._sleep.find((r) => r.id === this._toast?.adjust && !r.end);
+          this._dismissToast();
+          if (!rec) return;
+          const base = Date.parse(rec.start), d = new Date(base);
+          return this._openPane("adjust-start", { id: rec.id, base, time: `${pad(d.getHours())}:${pad(d.getMinutes())}`, by: null, error: "" });
+        }
+        case "adjust-by": {
+          const n = Number(el.dataset.n), d = new Date(this._form.base - n * 60000);
+          this._form.by = n; this._form.time = `${pad(d.getHours())}:${pad(d.getMinutes())}`; this._form.error = "";
+          this._renderSheet(); return;
+        }
+        case "save-start": return this._saveStart();
         case "open-feed":
           return this._openPane("feed", { breast: 0, formula: 0, when: "now", time: localInput(new Date(Date.now() - 30 * 60000)), note: "", error: "" });
         case "open-history": this._view = dayKey(new Date()); return this._openPane("history");
@@ -1001,7 +1227,7 @@
           } else {
             const rec = await this._ws({ type: "babyes/sleep/start" });
             await this._reload();
-            this._showToast(t("sleepStarted", { t: hm(Date.now()) }), rec?.id ? { kind: "sleep", id: rec.id } : null);
+            this._showToast(t("sleepStarted", { t: hm(Date.now()) }), rec?.id ? { kind: "sleep", id: rec.id } : null, false, rec?.id || null);
           }
         } catch (err) { this._showToast(errText(err), null, true); }
       });

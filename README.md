@@ -5,7 +5,7 @@
 A local sleep and bottle diary for Home Assistant, with a dashboard card.
 English and Norwegian (bokmål). [Norsk nedenfor](#norsk).
 
-- Start and stop sleep, register bottles (breast milk and formula), edit and delete entries.
+- Start and stop sleep, register bottles (breast milk and formula), edit and delete entries. Tap an amount to type it, and change the start of a sleep you started late straight from the message after **Start sleep**.
 - The card shows how long the baby has slept or been awake, today's sleep and bottles, and an optional 24-hour timeline of sleep and bottles ("Show timeline").
 - History with a 24-hour dial, week overview and 7-day charts.
 - Follows your Home Assistant profile: language, 12/24-hour clock, and the colours of your theme (light and dark).
@@ -49,7 +49,7 @@ Entity ids depend on the name you choose and your language.
 
 ## Theming, language and clock
 
-The card uses the colours of your active Home Assistant theme, in light and dark mode: card background, text and dividers from the theme, sleep in the theme's `primary-color` and bottles in its `accent-color`. If those two look too similar, bottles use another colour from the theme that stands out from the sleep colour. To give BabyEs its own colours, add any of these variables to your theme: `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color`, `babyes-card-color`.
+The card uses the colours of your active Home Assistant theme, in light and dark mode: card background, text and dividers from the theme, sleep in the theme's `primary-color` and bottles in its `accent-color`. If those two look too similar, bottles use another colour from the theme that stands out from the sleep colour. Formula gets a third theme colour that differs from both, so breast milk and formula are easy to tell apart. To give BabyEs its own colours, add any of these variables to your theme: `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color`, `babyes-card-color`.
 
 The language follows the language in your Home Assistant profile (Norwegian or English; other languages use English) and changes as soon as you switch it. Times follow the **Time format** in your profile (12 or 24 hours), like the rest of Home Assistant.
 
@@ -61,7 +61,7 @@ Animations respect the "reduce motion" setting of your device.
 
 En lokal dagbok for søvn og flasker i Home Assistant, med eget dashbordkort.
 
-- Start og stopp søvn, registrer flasker (brystmelk og MME), rediger og slett.
+- Start og stopp søvn, registrer flasker (brystmelk og MME), rediger og slett. Trykk på en mengde for å skrive den inn, og endre starttiden på en søvn du startet for sent rett fra meldingen etter **Start søvn**.
 - Kortet viser hvor lenge babyen har sovet eller vært våken, dagens søvn og flasker, og en tidslinje for døgnet som du kan vise eller skjule («Vis tidslinje»).
 - Historikk med døgnur, ukeoversikt og grafer for de siste 7 dagene.
 - Følger profilen din i Home Assistant: språk, 12/24-timersklokke og fargene i temaet ditt (lyst og mørkt).
@@ -85,6 +85,6 @@ Oppdateringer vises i HACS. Oppdateringer som bare endrer kortet, får du ved å
 
 ### Tema, språk og klokke
 
-Kortet bruker fargene i temaet du har valgt i Home Assistant: søvn i temaets `primary-color` og flasker i `accent-color`. Er de to for like, får flaskene en annen farge fra temaet som skiller seg tydelig fra søvnfargen. Vil du ha egne farger, kan du legge til `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color` eller `babyes-card-color` i temaet.
+Kortet bruker fargene i temaet du har valgt i Home Assistant: søvn i temaets `primary-color` og flasker i `accent-color`. Er de to for like, får flaskene en annen farge fra temaet som skiller seg tydelig fra søvnfargen. MME får en tredje farge fra temaet som skiller seg fra begge, så brystmelk og MME er lette å skille. Vil du ha egne farger, kan du legge til `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color` eller `babyes-card-color` i temaet.
 
 Språket følger profilen din og byttes med en gang du endrer det. Klokkeslett følger **Tidsformat** i profilen (12 eller 24 timer), som resten av Home Assistant.

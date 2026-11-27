@@ -2,6 +2,17 @@
 
 Each release says whether Home Assistant needs a restart. Card-only updates only need a reload of the dashboard.
 
+## 0.3.0
+
+Restart needed: **no**. Reload the dashboard.
+
+### Card
+- Messages after saving a bottle or starting and stopping a sleep are shorter: 2 seconds, or 4 seconds when they offer Undo or Change. An × closes them at once, so the history is never blocked.
+- Started a sleep late? Tap **Change** in the message after **Start sleep** and pick when the baby actually fell asleep: −5 to −45 minutes, or type the time.
+- Breast milk and formula now have clearly different colours, each taken from your theme, with a colour dot next to the name.
+- Tap the amount in a new or edited bottle to type it, for example 120 ml, instead of tapping + many times.
+- Swipe the sheet down to close it, from the handle and title or from the content when it is scrolled to the top.
+
 ## 0.2.2
 
 Restart needed: **no** if 0.2.1 is already installed and Home Assistant has been restarted once since. Coming from 0.2.0 or earlier: yes, once.
