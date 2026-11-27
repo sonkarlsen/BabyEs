@@ -1,4 +1,4 @@
-"""Authenticated WebSocket API used by the BabyEs dashboard card."""
+"""Authenticated WebSocket API used by the BabyEssentials dashboard card."""
 from __future__ import annotations
 
 from typing import Any
@@ -18,7 +18,7 @@ from .store import Diary, DiaryError
 def _diary(hass, connection, msg) -> Diary | None:
     runtime = get_runtime(hass)
     if runtime is None:
-        connection.send_error(msg["id"], "not_ready", "BabyEs is not set up or still loading.")
+        connection.send_error(msg["id"], "not_ready", "BabyEssentials is not set up or still loading.")
         return None
     return runtime["diary"]
 

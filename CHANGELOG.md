@@ -2,6 +2,17 @@
 
 Each release says whether Home Assistant needs a restart. Card-only updates only need a reload of the dashboard.
 
+## 0.3.1
+
+Restart needed: **no** for the card; reload the dashboard. The new name shows under Devices & services after the next restart.
+
+### Name
+- BabyEs is now called **BabyEssentials**, in Home Assistant, HACS and the card picker, and the repository is now `sonkarlsen/BabyEssentials`. Nothing changes for an existing setup: the integration id (`babyes`), the card type (`custom:babyes-card`), the services (`babyes.*`), the entities and the stored diary keep their names, so automations and dashboards keep working.
+
+### Card
+- While the baby sleeps, the moon lights up: a pale moon on a night sky in your theme's sleep colour, with a slow glow and two twinkling stars, so you can see it at a glance. The sky is darkened just enough to keep the moon clearly readable in any theme. Animations stop with "reduce motion".
+- After typing an amount, + and − first round to the step (5 ml by default), then move a whole step: 23, then + gives 25, then 30. − gives 20, then 15.
+
 ## 0.3.0
 
 Restart needed: **no**. Reload the dashboard.
@@ -30,7 +41,7 @@ Restart needed: **yes**, once. After this, updates that only change the card nee
 
 ### Integration
 - Card updates now show after a page reload, without restarting Home Assistant.
-- BabyEs now ships its own icon (light and dark), shown in Home Assistant 2026.3 and later, for example under Devices & services and in HACS updates.
+- BabyEssentials now ships its own icon (light and dark), shown in Home Assistant 2026.3 and later, for example under Devices & services and in HACS updates.
 
 ## 0.2.0
 
@@ -43,7 +54,7 @@ Restart needed: **yes**, once. After this, updates that only change the card nee
 - Pop-ups slide up and down, their content fades in, and amounts give a small bounce when changed. Turned off when your device asks for reduced motion.
 
 ### Integration
-- Removed the import from the earlier stand-alone sleep and bottle integrations (the setup option and the `babyes.import_history` service). Entries that were already imported stay in BabyEs.
+- Removed the import from the earlier stand-alone sleep and bottle integrations (the setup option and the `babyes.import_history` service). Entries that were already imported stay in BabyEssentials.
 
 ### Repository
 - New logo (`images/logo.svg`) and social preview image.

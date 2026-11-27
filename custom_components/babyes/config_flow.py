@@ -1,4 +1,4 @@
-"""Set up BabyEs from the UI. The name you enter stays in your Home Assistant only."""
+"""Set up BabyEssentials from the UI. The name you enter stays in your Home Assistant only."""
 from __future__ import annotations
 
 try:
@@ -16,7 +16,7 @@ def _name(value) -> str:
     return (str(value or "").strip() or DEFAULT_NAME)[:40]
 
 
-class BabyEsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class BabyEssentialsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
@@ -32,10 +32,10 @@ class BabyEsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
-        return BabyEsOptionsFlow()
+        return BabyEssentialsOptionsFlow()
 
 
-class BabyEsOptionsFlow(config_entries.OptionsFlow):
+class BabyEssentialsOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         if user_input is not None:
             name = _name(user_input.get(CONF_NAME))

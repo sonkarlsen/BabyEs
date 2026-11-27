@@ -13,7 +13,7 @@ from datetime import datetime
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.const import UnitOfTime, UnitOfVolume
 
-from .entity import BabyEsEntity
+from .entity import BabyEssentialsEntity
 from .runtime import get_runtime
 from .store import Diary, parse, utcnow
 
@@ -77,10 +77,10 @@ SPECS = (
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:
     runtime = get_runtime(hass)
-    async_add_entities([BabyEsSensor(runtime, spec) for spec in SPECS])
+    async_add_entities([BabyEssentialsSensor(runtime, spec) for spec in SPECS])
 
 
-class BabyEsSensor(BabyEsEntity, SensorEntity):
+class BabyEssentialsSensor(BabyEssentialsEntity, SensorEntity):
     def __init__(self, runtime: dict, spec: Spec) -> None:
         super().__init__(runtime, spec.key)
         self._spec = spec

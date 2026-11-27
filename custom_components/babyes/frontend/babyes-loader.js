@@ -1,4 +1,4 @@
-/* BabyEs card loader.
+/* BabyEssentials card loader.
  * Home Assistant registers this small file once at startup. On every page
  * load it asks the server which version of babyes-card.js is on disk (a HEAD
  * request; only headers, no download) and imports the card with that version

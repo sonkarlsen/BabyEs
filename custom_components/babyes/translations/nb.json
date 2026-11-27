@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Sett opp BabyEs",
+        "title": "Sett opp BabyEssentials",
         "description": "En lokal dagbok for søvn og flasker. Alt lagres i Home Assistant og er med i sikkerhetskopiene dine.",
         "data": {
           "name": "Navn"
@@ -13,14 +13,14 @@
       }
     },
     "abort": {
-      "already_configured": "BabyEs er allerede satt opp.",
-      "single_instance_allowed": "BabyEs er allerede satt opp."
+      "already_configured": "BabyEssentials er allerede satt opp.",
+      "single_instance_allowed": "BabyEssentials er allerede satt opp."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "BabyEs",
+        "title": "BabyEssentials",
         "data": { "name": "Navn" }
       }
     }
@@ -67,7 +67,7 @@
     }
   },
   "exceptions": {
-    "not_ready": { "message": "BabyEs er ikke satt opp eller laster fortsatt." },
+    "not_ready": { "message": "BabyEssentials er ikke satt opp eller laster fortsatt." },
     "invalid_time": { "message": "Ugyldig dato eller klokkeslett." },
     "no_timezone": { "message": "Tidspunktet må ha tidssone." },
     "time_required": { "message": "Dato og klokkeslett må fylles ut." },

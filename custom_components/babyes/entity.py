@@ -1,4 +1,4 @@
-"""Shared base for BabyEs entities: one device named by the user, translated entity names."""
+"""Shared base for BabyEssentials entities: one device named by the user, translated entity names."""
 from __future__ import annotations
 
 from homeassistant.core import callback
@@ -8,7 +8,7 @@ from homeassistant.helpers.entity import Entity
 from .const import DOMAIN, VERSION
 
 
-class BabyEsEntity(Entity):
+class BabyEssentialsEntity(Entity):
     _attr_should_poll = False
     _attr_has_entity_name = True
 
@@ -20,7 +20,7 @@ class BabyEsEntity(Entity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=runtime["name"],
-            manufacturer="BabyEs",
+            manufacturer="BabyEssentials",
             model="Diary",
             sw_version=VERSION,
             entry_type=DeviceEntryType.SERVICE,

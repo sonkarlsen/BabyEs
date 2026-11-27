@@ -1,4 +1,4 @@
-"""BabyEs diary: sleep periods and bottle feeds in one Home Assistant Store.
+"""BabyEssentials diary: sleep periods and bottle feeds in one Home Assistant Store.
 
 The data lives in ``/config/.storage/babyes.diary`` and is part of every Home
 Assistant backup. Every write is atomic at diary level: persist first, then

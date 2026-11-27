@@ -1,6 +1,6 @@
-<p align="center"><img src="images/logo.svg" alt="BabyEs logo" width="128"></p>
+<p align="center"><img src="images/logo.svg" alt="BabyEssentials logo" width="128"></p>
 
-# BabyEs
+# BabyEssentials
 
 A local sleep and bottle diary for Home Assistant, with a dashboard card.
 English and Norwegian (bokmål). [Norsk nedenfor](#norsk).
@@ -12,11 +12,13 @@ English and Norwegian (bokmål). [Norsk nedenfor](#norsk).
 - Entities and services for automations.
 - Everything is stored locally in Home Assistant (`/config/.storage/babyes.diary`) and included in backups. Nothing is sent anywhere.
 
+BabyEssentials was called BabyEs before version 0.3.1. Its id in Home Assistant is still `babyes`, so the card type, services and entities keep that name.
+
 ## Install
 
-1. In HACS, open **⋮ → Custom repositories**, add `https://github.com/sonkarlsen/BabyEs` with type **Integration**.
-2. Install **BabyEs** and restart Home Assistant.
-3. Go to **Settings → Devices & services → Add integration → BabyEs**. Enter a name (shown on the card).
+1. In HACS, open **⋮ → Custom repositories**, add `https://github.com/sonkarlsen/BabyEssentials` with type **Integration**.
+2. Install **BabyEssentials** and restart Home Assistant.
+3. Go to **Settings → Devices & services → Add integration → BabyEssentials**. Enter a name (shown on the card).
 
 The dashboard card is served by the integration, so no dashboard resource is needed. Add it to a dashboard:
 
@@ -49,7 +51,7 @@ Entity ids depend on the name you choose and your language.
 
 ## Theming, language and clock
 
-The card uses the colours of your active Home Assistant theme, in light and dark mode: card background, text and dividers from the theme, sleep in the theme's `primary-color` and bottles in its `accent-color`. If those two look too similar, bottles use another colour from the theme that stands out from the sleep colour. Formula gets a third theme colour that differs from both, so breast milk and formula are easy to tell apart. To give BabyEs its own colours, add any of these variables to your theme: `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color`, `babyes-card-color`.
+The card uses the colours of your active Home Assistant theme, in light and dark mode: card background, text and dividers from the theme, sleep in the theme's `primary-color` and bottles in its `accent-color`. If those two look too similar, bottles use another colour from the theme that stands out from the sleep colour. Formula gets a third theme colour that differs from both, so breast milk and formula are easy to tell apart. To give BabyEssentials its own colours, add any of these variables to your theme: `babyes-sleep-color`, `babyes-feed-color`, `babyes-milk-color`, `babyes-formula-color`, `babyes-card-color`.
 
 The language follows the language in your Home Assistant profile (Norwegian or English; other languages use English) and changes as soon as you switch it. Times follow the **Time format** in your profile (12 or 24 hours), like the rest of Home Assistant.
 
@@ -68,11 +70,13 @@ En lokal dagbok for søvn og flasker i Home Assistant, med eget dashbordkort.
 - Entiteter og tjenester til automasjoner.
 - Alt lagres lokalt i Home Assistant (`/config/.storage/babyes.diary`) og er med i sikkerhetskopiene. Ingenting sendes noe sted.
 
+BabyEssentials het BabyEs før versjon 0.3.1. ID-en i Home Assistant er fortsatt `babyes`, så korttypen, tjenestene og entitetene heter det samme som før.
+
 ### Installering
 
-1. I HACS: **⋮ → Egendefinerte repositorier**, legg til `https://github.com/sonkarlsen/BabyEs` med type **Integrasjon**.
-2. Installer **BabyEs** og start Home Assistant på nytt.
-3. Gå til **Innstillinger → Enheter og tjenester → Legg til integrasjon → BabyEs**. Skriv inn et navn (vises på kortet).
+1. I HACS: **⋮ → Egendefinerte repositorier**, legg til `https://github.com/sonkarlsen/BabyEssentials` med type **Integrasjon**.
+2. Installer **BabyEssentials** og start Home Assistant på nytt.
+3. Gå til **Innstillinger → Enheter og tjenester → Legg til integrasjon → BabyEssentials**. Skriv inn et navn (vises på kortet).
 
 Kortet leveres av integrasjonen, så du trenger ikke legge til en ressurs. Legg det i dashbordet:
 

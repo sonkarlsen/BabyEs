@@ -1,4 +1,4 @@
-"""BabyEs: sleep and bottle diary for Home Assistant.
+"""BabyEssentials: sleep and bottle diary for Home Assistant.
 
 Data is stored locally in /config/.storage/babyes.diary (included in backups).
 Nothing is sent anywhere. See README.md.

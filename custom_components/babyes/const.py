@@ -1,4 +1,4 @@
-"""Constants for BabyEs."""
+"""Constants for BabyEssentials."""
 
 DOMAIN = "babyes"
 VERSION = "0.2.2"

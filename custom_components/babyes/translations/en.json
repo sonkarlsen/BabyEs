@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Set up BabyEs",
+        "title": "Set up BabyEssentials",
         "description": "A local sleep and bottle diary. Everything is stored in Home Assistant and included in your backups.",
         "data": {
           "name": "Name"
@@ -13,14 +13,14 @@
       }
     },
     "abort": {
-      "already_configured": "BabyEs is already set up.",
-      "single_instance_allowed": "BabyEs is already set up."
+      "already_configured": "BabyEssentials is already set up.",
+      "single_instance_allowed": "BabyEssentials is already set up."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "BabyEs",
+        "title": "BabyEssentials",
         "data": { "name": "Name" }
       }
     }
@@ -67,7 +67,7 @@
     }
   },
   "exceptions": {
-    "not_ready": { "message": "BabyEs is not set up or still loading." },
+    "not_ready": { "message": "BabyEssentials is not set up or still loading." },
     "invalid_time": { "message": "Invalid date or time." },
     "no_timezone": { "message": "The time must include a time zone." },
     "time_required": { "message": "Date and time are required." },

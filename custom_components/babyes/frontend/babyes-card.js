@@ -1,8 +1,8 @@
-/* BabyEs Card
- * Sleep and bottle diary card for Home Assistant. Served by the BabyEs
+/* BabyEssentials Card
+ * Sleep and bottle diary card for Home Assistant. Served by the BabyEssentials
  * integration itself, so no dashboard resource is needed.
  *
- * Talks only to the BabyEs WebSocket API (babyes/*). Stores nothing itself,
+ * Talks only to the BabyEssentials WebSocket API (babyes/*). Stores nothing itself,
  * except whether the timeline is shown (localStorage, per device).
  * "Undo" only deletes the single entry this card created seconds earlier.
  * Language, 12/24-hour clock and colours follow the user's Home Assistant
@@ -15,7 +15,7 @@
 (() => {
   "use strict";
   const TAG = "babyes-card";
-  const VERSION = "0.3.0";
+  const VERSION = "0.3.1";
   if (customElements.get(TAG)) return;
 
   /* ---------- language ---------- */
@@ -65,7 +65,7 @@
       validWake: "Velg et gyldig tidspunkt for oppvåkning.", chooseWake: "Velg når søvnen sluttet.",
       wakeAfter: "Våknet må være etter sovnet.", noConn: "Ingen tilkobling til Home Assistant.",
       unknownErr: "Ukjent feil",
-      notSetup: "BabyEs er ikke satt opp. Legg den til under Innstillinger → Enheter og tjenester.",
+      notSetup: "BabyEssentials er ikke satt opp. Legg den til under Innstillinger → Enheter og tjenester.",
       h: "t", min: "min", cfgName: "Navn (valgfritt)", cfgStep: "Steg per trykk",
       cardDesc: "Søvn og flaske i ett kort: start/stopp søvn, ny flaske, historikk og grafer.",
       err_invalid_time: "Ugyldig dato eller klokkeslett.", err_no_timezone: "Tidspunktet må ha tidssone.",
@@ -81,7 +81,7 @@
       err_amount_invalid: "Mengder må være hele tall mellom 0 og 1000 ml.", err_amount_zero: "Registrer minst 1 ml.",
       err_note_too_long: "Notatet er for langt.", err_not_found: "Fant ikke registreringen. Last inn historikken på nytt.",
       err_conflict: "Registreringen er endret på en annen enhet. Åpne den på nytt.",
-      err_not_ready: "BabyEs er ikke satt opp eller laster fortsatt.",
+      err_not_ready: "BabyEssentials er ikke satt opp eller laster fortsatt.",
       err_storage_error: "Kunne ikke lagre. Prøv igjen.",
     },
     en: {
@@ -129,7 +129,7 @@
       validWake: "Choose a valid wake-up time.", chooseWake: "Choose when the sleep ended.",
       wakeAfter: "Wake-up must be after falling asleep.", noConn: "No connection to Home Assistant.",
       unknownErr: "Unknown error",
-      notSetup: "BabyEs is not set up. Add it under Settings → Devices & services.",
+      notSetup: "BabyEssentials is not set up. Add it under Settings → Devices & services.",
       h: "h", min: "min", cfgName: "Name (optional)", cfgStep: "Step per tap",
       cardDesc: "Sleep and bottles in one card: start/stop sleep, new bottle, history and charts.",
       err_invalid_time: "Invalid date or time.", err_no_timezone: "The time must include a time zone.",
@@ -145,7 +145,7 @@
       err_amount_invalid: "Amounts must be whole numbers between 0 and 1000 ml.", err_amount_zero: "Register at least 1 ml.",
       err_note_too_long: "The note is too long.", err_not_found: "The entry was not found. Reload the history.",
       err_conflict: "The entry was changed on another device. Open it again.",
-      err_not_ready: "BabyEs is not set up or still loading.",
+      err_not_ready: "BabyEssentials is not set up or still loading.",
       err_storage_error: "Could not save. Try again.",
     },
   };
@@ -261,6 +261,26 @@
     });
     return best ? best.raw : "";
   };
+  // Moonlight while asleep: a night sky made from the theme's sleep colour,
+  // darkened just enough that the pale moon on it has at least 4.5:1 contrast,
+  // and a moon tinted slightly towards the same colour.
+  const lum = ([r, g, b]) => {
+    const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  };
+  const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const mix = (a, b, w) => a.map((v, i) => Math.round(v * (1 - w) + b[i] * w));
+  const hex = (c) => `#${c.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+  const pickNightColours = (el) => {
+    const cs = getComputedStyle(el);
+    const sleep = toRgb(cs.getPropertyValue("--be-sleep")) || [3, 169, 244];
+    const moon = mix([255, 247, 222], sleep, 0.12);
+    const deep = [10, 14, 30];
+    let sky = sleep;
+    for (let w = 0.25; w <= 1; w += 0.05) { sky = mix(sleep, deep, w); if (contrast(moon, sky) >= 4.5) break; }
+    const vars = { "--be-night-sky": hex(sky), "--be-moon": hex(moon) };
+    return { key: `${vars["--be-night-sky"]}|${vars["--be-moon"]}`, vars };
+  };
   // Formula gets its own theme colour, as far as possible from both the
   // breast-milk colour and the sleep colour, so the two never look alike.
   const pickFormulaColour = (el) => {
@@ -368,7 +388,23 @@
   .eyebrow{font-size:12px;line-height:16px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--be-sleep-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .headline{margin:0;font-size:22px;line-height:1.2;font-weight:600;letter-spacing:-.01em}
   .sub{font-size:14px;color:var(--be-muted)}
-  .badge{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--be-sleep) 14%,var(--be-card));color:var(--be-sleep-ink)}
+  .badge{position:relative;width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--be-sleep) 14%,var(--be-card));color:var(--be-sleep-ink)}
+  /* asleep: a lit moon on a night sky in the theme's sleep colour, a slow breathing glow
+     and two twinkling stars, so it reads at a glance without any text */
+  .top{position:relative}
+  .top>*{position:relative}
+  .top.night::before{content:"";position:absolute;top:-60px;right:-60px;width:220px;height:200px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(closest-side,color-mix(in srgb,var(--be-sleep) 24%,transparent),transparent);animation:be-glow 4s ease-in-out infinite;animation-delay:var(--be-phase,0s)}
+  .badge.night{width:44px;height:44px;margin:-2px -2px 0 0;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--be-night-sky) 80%,var(--be-moon)),var(--be-night-sky) 70%);color:var(--be-moon);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--be-sleep) 22%,transparent),0 0 18px 3px color-mix(in srgb,var(--be-sleep) 45%,transparent);animation:be-halo 4s ease-in-out infinite;animation-delay:var(--be-phase,0s)}
+  .badge.night .ico{fill:currentColor;stroke:currentColor;filter:drop-shadow(0 0 4px color-mix(in srgb,var(--be-moon) 70%,transparent))}
+  .badge.night i{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--be-moon);animation:be-twinkle 2.6s ease-in-out infinite}
+  .badge.night i:nth-of-type(1){top:9px;right:9px;animation-delay:calc(var(--be-phase,0s) * .65)}
+  .badge.night i:nth-of-type(2){bottom:10px;left:10px;width:2px;height:2px;animation-delay:calc(var(--be-phase,0s) * .65 - 1.3s)}
+  @keyframes be-halo{0%,100%{box-shadow:0 0 0 3px color-mix(in srgb,var(--be-sleep) 18%,transparent),0 0 12px 2px color-mix(in srgb,var(--be-sleep) 32%,transparent)}
+    50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--be-sleep) 26%,transparent),0 0 26px 6px color-mix(in srgb,var(--be-sleep) 55%,transparent)}}
+  @keyframes be-glow{0%,100%{opacity:.65}50%{opacity:1}}
+  @keyframes be-twinkle{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
   .strip{width:100%;min-height:48px;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border:0;border-radius:12px;background:var(--be-soft);text-align:left;transition:background-color .15s ease}
   .strip:hover{background:color-mix(in srgb,var(--be-ink) 8%,var(--be-card))}
   .halves{flex:1;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -515,7 +551,7 @@
   @media (prefers-reduced-motion:reduce){*,*::backdrop{animation:none!important;transition:none!important}}
   `;
 
-  class BabyEsCard extends HTMLElement {
+  class BabyEssentialsCard extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
@@ -648,7 +684,7 @@
     get _name() { return this._config.name || this._backendName || "Baby"; }
 
     setConfig(config) {
-      if (!config || typeof config !== "object") throw new Error("BabyEs: invalid configuration.");
+      if (!config || typeof config !== "object") throw new Error("BabyEssentials: invalid configuration.");
       const step = Math.trunc(num(config.step ?? 5));
       this._config = { name: String(config.name || ""), step: Math.max(1, Math.min(50, step || 5)) };
       this._renderCard();
@@ -681,6 +717,11 @@
         this._feedColour = c;
         if (c) this.style.setProperty("--be-feed-auto", c);
         else this.style.removeProperty("--be-feed-auto");
+      }
+      const night = pickNightColours(this);
+      if (night.key !== this._nightKey) {
+        this._nightKey = night.key;
+        for (const [k, v] of Object.entries(night.vars)) this.style.setProperty(k, v);
       }
       const f = pickFormulaColour(this);
       if (f === this._formulaColour) return;
@@ -829,9 +870,9 @@
         </div></div></div>`;
 
       this._cardEl.innerHTML = `<ha-card class="be">
-        <div class="top">
+        <div class="top${ongoing ? " night" : ""}" style="--be-phase:${-((now % 4000) / 1000).toFixed(2)}s">
           <div class="head"><div class="state"><span class="eyebrow">${esc(name)}</span><h2 class="headline">${esc(headline)}</h2><span class="sub">${esc(since)}</span></div>
-            <span class="badge" aria-hidden="true">${icon(ongoing ? "moon" : "sun", 20)}</span></div>
+            <span class="badge${ongoing ? " night" : ""}" aria-hidden="true">${icon(ongoing ? "moon" : "sun", ongoing ? 22 : 20)}${ongoing ? "<i></i><i></i>" : ""}</span></div>
           <div class="slot" role="status" aria-live="polite">${slot}</div>
           <button type="button" class="tl-toggle" data-action="timeline" aria-expanded="${open}" aria-controls="tl" ${!ready ? "disabled" : ""}>${esc(open ? t("hideTimeline") : t("showTimeline"))}${icon("down", 16)}</button>
           ${timeline}
@@ -1180,7 +1221,10 @@
         case "back": this._form = null; this._pane = "history"; this._renderSheet(); this._animate("swap", 260); return;
         case "use-last": { const l = this._lastFeed(); if (l) { this._form.breast = clampMl(l.e.breast_milk_ml); this._form.formula = clampMl(l.e.formula_ml); this._renderSheet(); } return; }
         case "step": {
-          this._form[el.dataset.key] = clampMl(this._form[el.dataset.key] + Number(el.dataset.d) * step);
+          // A typed amount off the step (23) first snaps to it (+ → 25, − → 20), then moves a whole step.
+          const cur = clampMl(this._form[el.dataset.key]), dir = Number(el.dataset.d);
+          const off = cur % step;
+          this._form[el.dataset.key] = clampMl(off ? (dir > 0 ? cur - off + step : cur - off) : cur + dir * step);
           this._bump = el.dataset.key; this._renderSheet(); this._bump = "";
           return;
         }
@@ -1314,11 +1358,11 @@
     }
   }
 
-  customElements.define(TAG, BabyEsCard);
+  customElements.define(TAG, BabyEssentialsCard);
   window.customCards = window.customCards || [];
   if (!window.customCards.some((c) => c.type === TAG)) {
     pickLang({ language: document.documentElement.lang });
-    window.customCards.push({ type: TAG, name: "BabyEs", description: t("cardDesc"), preview: false });
+    window.customCards.push({ type: TAG, name: "BabyEssentials", description: t("cardDesc"), preview: false });
   }
-  console.info(`%c BABYES CARD %c ${VERSION} `, "background:#3E3A45;color:#F3EEF1;font-weight:bold", "background:#C9AEBC;color:#2A2430");
+  console.info(`%c BABYESSENTIALS CARD %c ${VERSION} `, "background:#3E3A45;color:#F3EEF1;font-weight:bold", "background:#C9AEBC;color:#2A2430");
 })();
